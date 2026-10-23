@@ -1,0 +1,387 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inicio - EduNova{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Hero ── */
+  .hero-section {
+    min-height: calc(100vh - 70px);
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    margin: -1.5rem -1.5rem 0;
+    padding: 4rem 2rem;
+  }
+
+  /* Orbes animados de fondo */
+  .hero-section::before,
+  .hero-section::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    animation: float 8s ease-in-out infinite;
+  }
+  .hero-section::before {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #8B5CF6, #6D28D9);
+    top: -150px; left: -100px;
+  }
+  .hero-section::after {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #3B82F6, #1D4ED8);
+    bottom: -100px; right: -80px;
+    animation-delay: -4s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%       { transform: translateY(-30px) scale(1.05); }
+  }
+
+  /* Partículas decorativas */
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    animation: drift linear infinite;
+  }
+  @keyframes drift {
+    from { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    to   { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+  }
+
+  /* Contenido del hero */
+  .hero-content { position: relative; z-index: 2; }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: rgba(139,92,246,.25);
+    border: 1px solid rgba(139,92,246,.5);
+    color: #C4B5FD;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: .4rem 1rem;
+    border-radius: 9999px;
+    backdrop-filter: blur(6px);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 1.25rem;
+  }
+  .hero-title .gradient-text {
+    background: linear-gradient(90deg, #A78BFA, #60A5FA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,.68);
+    line-height: 1.7;
+    max-width: 540px;
+    margin-bottom: 2.5rem;
+  }
+
+  /* Botones hero */
+  .btn-hero-primary {
+    background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    padding: .85rem 2rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    box-shadow: 0 8px 30px rgba(139,92,246,.45);
+    transition: all .3s ease;
+    text-decoration: none;
+  }
+  .btn-hero-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(139,92,246,.6);
+    color: #fff;
+  }
+
+  .btn-hero-outline {
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,.3);
+    color: rgba(255,255,255,.85);
+    font-weight: 600;
+    padding: .85rem 2rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    backdrop-filter: blur(6px);
+    transition: all .3s ease;
+    text-decoration: none;
+  }
+  .btn-hero-outline:hover {
+    background: rgba(255,255,255,.1);
+    border-color: rgba(255,255,255,.6);
+    color: #fff;
+    transform: translateY(-3px);
+  }
+
+  /* Stats bar */
+  .stat-item {
+    text-align: center;
+    padding: .5rem 1.5rem;
+    border-right: 1px solid rgba(255,255,255,.12);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-number {
+    font-size: 1.9rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #A78BFA, #60A5FA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+  .stat-label {
+    font-size: .72rem;
+    color: rgba(255,255,255,.5);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-weight: 500;
+  }
+
+  /* Tarjeta flotante visual hero */
+  .hero-visual {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-logo-card {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 24px;
+    padding: 2.5rem;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 25px 60px rgba(0,0,0,.4);
+    animation: cardFloat 6s ease-in-out infinite;
+  }
+  .hero-logo-card img { width: 200px; height: auto; border-radius: 12px; }
+
+  @keyframes cardFloat {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50%       { transform: translateY(-18px) rotate(1deg); }
+  }
+
+  /* Características / feature cards */
+  .features-section {
+    padding: 4rem 0 2rem;
+  }
+  .feature-card {
+    background: #fff;
+    border: 1px solid #EDE9FE;
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all .3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #8B5CF6, #60A5FA);
+    transform: scaleX(0);
+    transition: transform .3s ease;
+  }
+  .feature-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(139,92,246,.12); }
+  .feature-card:hover::before { transform: scaleX(1); }
+
+  .feature-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+
+  /* CTA section */
+  .cta-section {
+    background: linear-gradient(135deg, #1E1B4B, #312E81);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    text-align: center;
+    margin: 2rem 0 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    background: rgba(139,92,246,.2);
+    border-radius: 50%;
+    top: -100px; right: -80px;
+    filter: blur(60px);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<section class="hero-section">
+
+  <!-- Partículas flotantes de fondo -->
+  <div class="particle" style="width:8px;height:8px;left:10%;animation-duration:12s;animation-delay:0s;"></div>
+  <div class="particle" style="width:5px;height:5px;left:25%;animation-duration:9s;animation-delay:2s;"></div>
+  <div class="particle" style="width:10px;height:10px;left:60%;animation-duration:15s;animation-delay:1s;"></div>
+  <div class="particle" style="width:6px;height:6px;left:80%;animation-duration:11s;animation-delay:4s;"></div>
+  <div class="particle" style="width:4px;height:4px;left:45%;animation-duration:8s;animation-delay:3s;"></div>
+
+  <div class="container-fluid px-4">
+    <div class="row align-items-center g-5">
+
+      <!-- Texto izquierda -->
+      <div class="col-lg-7 hero-content">
+
+        <div class="hero-badge">
+          <i class="bi bi-stars"></i>
+          Sistema de Seguimiento Media Técnica
+        </div>
+
+        <h1 class="hero-title">
+          Gestiona el futuro<br>
+          <span class="gradient-text">de la educación técnica</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Plataforma integral para el seguimiento, evaluación y control del proceso de integración con la Media Técnica. Datos en tiempo real, trazabilidad completa.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3 mb-5">
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="btn-hero-primary">
+              <i class="bi bi-speedometer2 me-2"></i>Ir al Dashboard
+            </a>
+            <a href="{% url 'instituciones_lista' %}" class="btn-hero-outline">
+              <i class="bi bi-building me-2"></i>Ver Instituciones
+            </a>
+          {% else %}
+            <a href="{% url 'login' %}" class="btn-hero-primary">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- Stats -->
+        <div class="d-flex flex-wrap" style="background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:16px; backdrop-filter:blur(10px); width:fit-content;">
+          <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">En línea</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">4</div>
+            <div class="stat-label">Módulos</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Disponible</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Visual derecha -->
+      <div class="col-lg-5 hero-visual d-none d-lg-flex">
+        <div class="hero-logo-card">
+          <img src="{% static 'img/edunova_logo.jpg' %}" alt="EduNova Logo">
+          <div class="mt-3 text-center">
+            <div style="color:rgba(255,255,255,.9); font-weight:700; font-size:1.1rem;">EduNova</div>
+            <div style="color:rgba(255,255,255,.45); font-size:.78rem;">Regional Magdalena</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ FEATURES ════════════════════ -->
+<section class="features-section">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold" style="color:#1E1B4B; font-size:1.9rem;">
+      Todo lo que necesitas, <span style="color:#8B5CF6;">en un solo lugar</span>
+    </h2>
+    <p class="text-muted">Módulos diseñados para simplificar la gestión académica institucional.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6 col-xl-3">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EDE9FE; color:#7C3AED;">
+          <i class="bi bi-building-fill"></i>
+        </div>
+        <h5 class="fw-bold mb-2" style="color:#1E1B4B;">Instituciones</h5>
+        <p class="text-muted small mb-0">Gestiona los colegios articulados, su información oficial y estado de vinculación.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#D1FAE5; color:#059669;">
+          <i class="bi bi-folder2-open"></i>
+        </div>
+        <h5 class="fw-bold mb-2" style="color:#1E1B4B;">Fichas de Formación</h5>
+        <p class="text-muted small mb-0">Organiza y consulta las fichas SENA activas, aprendices matriculados y programas técnicos.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#DBEAFE; color:#1D4ED8;">
+          <i class="bi bi-journal-check"></i>
+        </div>
+        <h5 class="fw-bold mb-2" style="color:#1E1B4B;">Seguimiento</h5>
+        <p class="text-muted small mb-0">Registra visitas, bitácoras y avances por institución con trazabilidad completa.</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FEF3C7; color:#D97706;">
+          <i class="bi bi-patch-check-fill"></i>
+        </div>
+        <h5 class="fw-bold mb-2" style="color:#1E1B4B;">Calificaciones</h5>
+        <p class="text-muted small mb-0">Evalúa resultados de aprendizaje y genera reportes de desempeño por ficha.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ CTA FINAL ════════════════════ -->
+{% if not user.is_authenticated %}
+<div class="cta-section">
+  <div style="position:relative; z-index:1;">
+    <h3 class="fw-bold text-white mb-2">¿Listo para comenzar?</h3>
+    <p style="color:rgba(255,255,255,.6);" class="mb-4">Inicia sesión para acceder a todos los módulos del sistema.</p>
+    <a href="{% url 'login' %}" class="btn-hero-primary d-inline-block">
+      <i class="bi bi-box-arrow-in-right me-2"></i>Acceder a EduNova
+    </a>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

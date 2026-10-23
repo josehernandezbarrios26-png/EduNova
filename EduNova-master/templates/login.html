@@ -1,0 +1,85 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Iniciar Sesión - EduNova{% endblock %}
+
+{% block content %}
+<style>
+    .login-page {
+        position: relative;
+        min-height: 75vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(rgba(10, 31, 53, 0.68), rgba(10, 31, 53, 0.72)),
+                    url('{% static "img/edunova_logo.jpg" %}') center center / cover no-repeat;
+        border-radius: 24px;
+        overflow: hidden;
+    }
+
+    .login-card {
+        backdrop-filter: blur(6px);
+        background: rgba(255, 255, 255, 0.93);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+</style>
+
+<div class="login-page px-3 py-5">
+    <div class="col-md-6 col-lg-5 col-xl-4 w-100" style="max-width: 430px;">
+        <div class="edunova-card p-4 p-sm-5 shadow-lg border-0 login-card">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex p-3 rounded-circle bg-primary bg-opacity-10 text-primary mb-3">
+                    <i class="bi bi-shield-lock-fill fs-1"></i>
+                </div>
+                <h2 class="h4 fw-bold mb-1">Acceso a EduNova</h2>
+                <p class="text-muted small">
+                    Seguimiento a la Integración con la Media Técnica<br>
+                    <strong>Centro de Logística y Promoción Ecoturística</strong>
+                </p>
+            </div>
+
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label fw-medium small">Usuario o Documento</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                        {{ form.username }}
+                    </div>
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.password.id_for_label }}" class="form-label fw-medium small">Contraseña</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                        {{ form.password }}
+                    </div>
+                    {% if form.password.errors %}
+                        <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-edunova-primary w-100 py-2 fw-semibold">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Ingresar a la Plataforma
+                </button>
+            </form>
+
+            <div class="mt-4 p-3 border rounded-3 bg-light">
+                <p class="small fw-semibold text-dark mb-2">Acceso por rol</p>
+                <p class="small text-muted mb-0">Cada usuario debe usar sus credenciales asignadas por el administrador del sistema. Si no recuerda su usuario o contraseña, contacte al administrador.</p>
+            </div>
+
+            <div class="text-center mt-4 pt-3 border-top">
+                <p class="small text-muted mb-0">
+                    Regional Magdalena · ADSI Ficha 228106
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

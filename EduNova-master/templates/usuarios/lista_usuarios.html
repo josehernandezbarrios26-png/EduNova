@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Usuarios - EduNova{% endblock %}
+
+{% block content %}
+<div class="dashboard-hero mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+            <span class="dashboard-chip">Administración</span>
+            <h1 class="dashboard-title mb-2">Gestión de Usuarios</h1>
+            <p class="dashboard-subtitle mb-0">
+                Administración de cuentas, roles y estados de los usuarios del sistema.
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <a href="{% url 'crear_usuario' %}" class="btn btn-edunova-primary">
+                <i class="bi bi-person-plus me-1"></i> Nuevo Usuario
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="edunova-card mb-4">
+    <div class="p-3">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold">Buscar</label>
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Nombre, documento, correo o usuario...">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Rol</label>
+                <select name="rol" class="form-select">
+                    <option value="">Todos los roles</option>
+                    {% for rol in roles %}
+                    <option value="{{ rol.nombre }}" {% if rol_filtro == rol.nombre %}selected{% endif %}>{{ rol.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Estado</label>
+                <select name="estado" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="activos" {% if estado_filtro == 'activos' %}selected{% endif %}>Activos</option>
+                    <option value="inactivos" {% if estado_filtro == 'inactivos' %}selected{% endif %}>Inactivos</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search me-1"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de usuarios -->
+<div class="edunova-card">
+    <div class="edunova-card-header d-flex justify-content-between align-items-center">
+        <span class="h6 mb-0 fw-bold"><i class="bi bi-people text-primary me-2"></i>Usuarios Registrados ({{ perfiles|length }})</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-edunova table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Nombre Completo</th>
+                    <th>Documento</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Institución</th>
+                    <th>Estado</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for perfil in perfiles %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold">{{ perfil.usuario.get_full_name|default:perfil.usuario.username }}</div>
+                        <small class="text-muted">@{{ perfil.usuario.username }}</small>
+                    </td>
+                    <td>
+                        <small class="text-muted">{{ perfil.get_tipo_documento_display }}</small><br>
+                        <span class="fw-medium">{{ perfil.numero_documento }}</span>
+                    </td>
+                    <td>{{ perfil.usuario.email|default:'-' }}</td>
+                    <td>
+                        {% if perfil.rol %}
+                        <span class="badge bg-primary bg-opacity-10 text-primary">{{ perfil.rol.nombre }}</span>
+                        {% else %}
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary">Sin rol</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if perfil.institucion %}
+                        <small>{{ perfil.institucion.nombre|truncatechars:30 }}</small>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if perfil.esta_activo %}
+                        <span class="badge bg-success bg-opacity-10 text-success">Activa</span>
+                        {% else %}
+                        <span class="badge bg-danger bg-opacity-10 text-danger">Inactiva</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'editar_usuario' perfil.id %}" class="btn btn-outline-primary" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="{% url 'gestionar_roles' %}?perfil={{ perfil.id }}" class="btn btn-outline-warning" title="Cambiar rol">
+                                <i class="bi bi-person-gear"></i>
+                            </a>
+                            {% if perfil.usuario_id != user.id %}
+                            <form method="POST" action="{% url 'toggle_activo_usuario' perfil.id %}" class="d-inline">
+                                {% csrf_token %}
+                                {% if perfil.esta_activo %}
+                                <button type="submit" class="btn btn-outline-danger" title="Desactivar cuenta" onclick="return confirm('¿Desactivar la cuenta de {{ perfil.usuario.get_full_name|default:perfil.usuario.username }}?');">
+                                    <i class="bi bi-person-x"></i>
+                                </button>
+                                {% else %}
+                                <button type="submit" class="btn btn-outline-success" title="Activar cuenta" onclick="return confirm('¿Activar la cuenta de {{ perfil.usuario.get_full_name|default:perfil.usuario.username }}?');">
+                                    <i class="bi bi-person-check"></i>
+                                </button>
+                                {% endif %}
+                            </form>
+                            {% else %}
+                            <button class="btn btn-outline-secondary" disabled title="No puede modificarse a sí mismo">
+                                <i class="bi bi-lock"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-3 d-block mb-1"></i>
+                        No se encontraron usuarios con los criterios de búsqueda.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-hero {
+    background: linear-gradient(135deg, rgba(109, 40, 217, 0.12), rgba(139, 92, 246, 0.04));
+    border: 1px solid rgba(139, 92, 246, 0.16);
+    border-radius: 22px;
+    padding: 1.75rem 1.5rem;
+    box-shadow: 0 12px 30px rgba(109, 40, 217, 0.08);
+}
+.dashboard-chip {
+    display: inline-block;
+    background: linear-gradient(135deg, #6D28D9, #8B5CF6);
+    color: #fff;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+}
+.dashboard-title {
+    font-size: clamp(2rem, 2vw, 2.6rem);
+    font-weight: 800;
+    color: #1e1b4b;
+    letter-spacing: -0.04em;
+}
+.dashboard-subtitle {
+    color: #4b5563;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+</style>
+{% endblock %}

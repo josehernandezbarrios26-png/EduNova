@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Boletín académico - EduNova{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1 text-dark">Boletín académico</h1>
+        <p class="text-muted mb-0">Resumen del desempeño del aprendiz por competencias y resultados de aprendizaje.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary" href="{% url 'evaluaciones_boletin_pdf' matricula.id %}" target="_blank">
+            <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+        </a>
+        <a class="btn btn-outline-success" href="{% url 'evaluaciones_boletin_xlsx' matricula.id %}">
+            <i class="bi bi-file-earmark-excel me-1"></i> Excel
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-6">
+        <div class="edunova-card p-4 h-100">
+            <div class="text-uppercase small fw-bold text-primary mb-2">Aprendiz</div>
+            <h4 class="fw-bold mb-1">{{ aprendiz.get_full_name|default:aprendiz.username }}</h4>
+            <p class="text-muted mb-0">Ficha {{ ficha.codigo_ficha }} · {{ ficha.programa.denominacion }}</p>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2">
+        <div class="edunova-card p-4 h-100">
+            <div class="text-uppercase small fw-bold text-success mb-2">Aprobados</div>
+            <h3 class="fw-bold mb-0">{{ datos.aprobados }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2">
+        <div class="edunova-card p-4 h-100">
+            <div class="text-uppercase small fw-bold text-warning-emphasis mb-2">Por mejorar</div>
+            <h3 class="fw-bold mb-0">{{ datos.no_aprobados }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2">
+        <div class="edunova-card p-4 h-100">
+            <div class="text-uppercase small fw-bold text-secondary mb-2">Pendientes</div>
+            <h3 class="fw-bold mb-0">{{ datos.pendientes }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="edunova-card p-4">
+    <p class="small text-muted mb-3">RAP evaluados: {{ datos.evaluados }} de {{ datos.total_raps }}</p>
+    {% if puede_calificar and not ficha.periodo_cerrado %}
+    <form method="post">
+        {% csrf_token %}
+    {% endif %}
+    <div class="table-responsive">
+        <table class="table table-edunova align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Competencia</th>
+                    <th>RAP</th>
+                    <th>Descripción</th>
+                    <th>Juicio</th>
+                    <th>Estado</th>
+                    <th>Observación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for competencia in datos.competencias %}
+                    {% for rap in competencia.resultados %}
+                    <tr>
+                        <td>{{ competencia.codigo }}</td>
+                        <td>{{ rap.codigo }}</td>
+                        <td>{{ rap.descripcion }}</td>
+                        <td>
+                            {% if puede_calificar and not ficha.periodo_cerrado %}
+                            <select class="form-select form-select-sm" name="juicio_{{ rap.id }}" aria-label="Juicio para {{ rap.codigo }}">
+                                <option value="" {% if not rap.juicio_valor %}selected{% endif %}>Sin evaluar</option>
+                                <option value="A" {% if rap.juicio_valor == 'A' %}selected{% endif %}>A · Aprobado</option>
+                                <option value="D" {% if rap.juicio_valor == 'D' %}selected{% endif %}>D · Por mejorar</option>
+                            </select>
+                            {% else %}
+                                {{ rap.juicio_valor|default:'-' }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if rap.estado == 'Aprobado' %}
+                                <span class="badge bg-success-subtle text-success-emphasis">Aprobado</span>
+                            {% elif rap.estado == 'Por mejorar' %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis">Por mejorar</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary-emphasis">Sin evaluar</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if puede_calificar and not ficha.periodo_cerrado %}
+                            <input class="form-control form-control-sm" name="obs_{{ rap.id }}" value="{{ rap.observacion }}" aria-label="Observación para {{ rap.codigo }}">
+                            {% else %}
+                                {{ rap.observacion|default:'-' }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No hay resultados de aprendizaje registrados para este boletín.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if puede_calificar and not ficha.periodo_cerrado %}
+        <div class="d-flex justify-content-end pt-3">
+            <button class="btn btn-edunova-primary" type="submit"><i class="bi bi-floppy me-1"></i>Guardar calificaciones</button>
+        </div>
+    </form>
+    {% elif ficha.periodo_cerrado and puede_calificar %}
+        <p class="alert alert-warning mt-3 mb-0">El periodo está cerrado; las notas se pueden consultar, pero no modificar.</p>
+    {% endif %}
+</div>
+{% endblock %}

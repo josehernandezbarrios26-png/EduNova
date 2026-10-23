@@ -1,0 +1,90 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - EduNova{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="mb-3">
+            <a href="{% url 'seguimiento_lista' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Cancelar y Volver
+            </a>
+        </div>
+
+        <div class="edunova-card p-4 p-md-5">
+            <h2 class="h4 fw-bold mb-1 text-dark">{{ titulo }}</h2>
+            <p class="text-muted small mb-4">
+                Diligencie el diagnóstico pedagógico de la visita o sesión. Si detecta bajo rendimiento o novedades de asistencia, registre los compromisos obligatorios conforme a la regla <strong>RN-006</strong>.
+            </p>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        <label class="form-label small fw-semibold">Ficha Técnica Objeto de Visita *</label>
+                        {{ form.ficha }}
+                    </div>
+
+                    <div class="col-md-5">
+                        <label class="form-label small fw-semibold">Aprendiz Específico (Opcional si fue grupal)</label>
+                        {{ form.matricula }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Fecha de la Visita Presencial *</label>
+                        {{ form.fecha_visita }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Tipo de Sesión / Seguimiento *</label>
+                        {{ form.tipo_seguimiento }}
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Diagnóstico Pedagógico y Observaciones Técnicas *</label>
+                        {{ form.observaciones }}
+                        {% if form.observaciones.errors %}
+                            <div class="text-danger small mt-1">{{ form.observaciones.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Sección de Compromisos (RN-006) -->
+                    <div class="col-12 p-3 bg-light rounded-3 border">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-shield-exclamation text-warning fs-5"></i>
+                            <h6 class="mb-0 fw-bold">Compromisos Formativos y Plan de Mejora (Regla RN-006)</h6>
+                        </div>
+                        <p class="small text-muted mb-2">
+                            Si se detectó bajo rendimiento o fallas reiteradas, registre los acuerdos acordados y la fecha límite de cumplimiento.
+                        </p>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Plan de Acción / Compromisos:</label>
+                            {{ form.compromisos }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Fecha Límite de Verificación (Obligatoria si hay compromisos):</label>
+                            {{ form.fecha_verificacion }}
+                            {% if form.fecha_verificacion.errors %}
+                                <div class="text-danger small mt-1">{{ form.fecha_verificacion.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Adjuntar Acta Firmada o Soporte Escaneado (PDF / Imagen):</label>
+                        {{ form.archivo_adjunto }}
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <a href="{% url 'seguimiento_lista' %}" class="btn btn-light px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-edunova-primary px-4 fw-semibold">
+                        <i class="bi bi-check-circle-fill me-1"></i> Guardar Bitácora
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

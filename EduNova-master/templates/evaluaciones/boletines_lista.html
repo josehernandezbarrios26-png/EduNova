@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Boletines académicos - EduNova{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1">Boletines académicos</h1>
+        <p class="text-muted mb-0">Consulta de resultados de aprendizaje según tu rol y vinculación institucional.</p>
+    </div>
+</div>
+
+<form method="get" class="row g-2 mb-4" role="search">
+    <div class="col-md-6 col-lg-4">
+        <label for="boletin-search" class="visually-hidden">Buscar aprendiz o ficha</label>
+        <input id="boletin-search" name="q" value="{{ busqueda }}" class="form-control" placeholder="Buscar aprendiz o ficha">
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-edunova-primary" type="submit"><i class="bi bi-search me-1"></i>Buscar</button>
+    </div>
+    {% if busqueda %}
+    <div class="col-auto">
+        <a href="{% url 'evaluaciones_boletines' %}" class="btn btn-outline-secondary">Limpiar</a>
+    </div>
+    {% endif %}
+</form>
+
+<div class="edunova-card">
+    <div class="table-responsive">
+        <table class="table table-edunova table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Aprendiz</th>
+                    <th>Ficha</th>
+                    <th>Institución</th>
+                    <th>Programa</th>
+                    <th class="text-end">Boletín</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for matricula in matriculas %}
+                <tr>
+                    <td class="fw-semibold">{{ matricula.aprendiz.get_full_name|default:matricula.aprendiz.username }}</td>
+                    <td>{{ matricula.ficha.codigo_ficha }}</td>
+                    <td>{{ matricula.ficha.institucion.nombre }}</td>
+                    <td>{{ matricula.ficha.programa.denominacion }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'evaluaciones_boletin' matricula.id %}" class="btn btn-sm btn-outline-primary" aria-label="Abrir boletín de {{ matricula.aprendiz.get_full_name|default:matricula.aprendiz.username }}">
+                            <i class="bi bi-file-earmark-text me-1"></i>Ver boletín
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No hay boletines disponibles para tu cuenta.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

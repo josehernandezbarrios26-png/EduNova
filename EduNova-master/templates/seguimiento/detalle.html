@@ -1,0 +1,78 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Bitácora {{ bitacora.fecha_visita }} - EduNova{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="mb-3">
+            <a href="{% url 'seguimiento_lista' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Volver al Listado de Bitácoras
+            </a>
+        </div>
+
+        <div class="edunova-card p-4 p-md-5">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 border-bottom pb-3">
+                <div>
+                    <span class="badge bg-primary mb-1">Ficha {{ bitacora.ficha.codigo_ficha }}</span>
+                    <h1 class="h4 fw-bold mb-0 text-dark">Acta de Bitácora de Seguimiento</h1>
+                    <small class="text-muted">{{ bitacora.ficha.institucion.nombre }} ({{ bitacora.ficha.institucion.municipio }})</small>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-light text-dark border fs-6">{{ bitacora.tipo_seguimiento }}</span><br>
+                    <small class="text-muted">Fecha de Visita: <strong>{{ bitacora.fecha_visita|date:"d/m/Y" }}</strong></small>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <small class="text-muted d-block">Instructor Responsable:</small>
+                    <strong>{{ bitacora.instructor.get_full_name|default:bitacora.instructor.username }}</strong>
+                </div>
+                <div class="col-md-6">
+                    <small class="text-muted d-block">Destinatario de la Observación:</small>
+                    {% if bitacora.matricula %}
+                        <span class="badge bg-info text-dark">Individual: {{ bitacora.matricula.aprendiz.get_full_name }}</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Acompañamiento General de Toda la Ficha</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h6 class="fw-bold text-primary">Diagnóstico Pedagógico y Observaciones:</h6>
+                <div class="p-3 bg-light rounded-3 border">
+                    {{ bitacora.observaciones|linebreaks }}
+                </div>
+            </div>
+
+            {% if bitacora.compromisos %}
+                <div class="mb-4 p-3 bg-warning bg-opacity-10 rounded-3 border border-warning">
+                    <h6 class="fw-bold text-dark"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Compromisos y Plan de Mejora (RN-006):</h6>
+                    <p class="mb-2">{{ bitacora.compromisos|linebreaks }}</p>
+                    <small class="fw-bold text-dark">
+                        <i class="bi bi-calendar-check me-1"></i>Fecha Límite de Verificación: {{ bitacora.fecha_verificacion|date:"d/m/Y" }}
+                    </small>
+                </div>
+            {% endif %}
+
+            {% if bitacora.archivo_adjunto %}
+                <div class="mb-4 p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-file-earmark-pdf-fill text-danger fs-3 me-2"></i>
+                        <strong>Soporte o Acta Escaneada Adjunta</strong>
+                    </div>
+                    <a href="{{ bitacora.archivo_adjunto.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-download me-1"></i> Ver / Descargar Documento
+                    </a>
+                </div>
+            {% endif %}
+
+            <div class="text-muted small pt-3 border-top d-flex justify-content-between">
+                <span>Registrado en EduNova: {{ bitacora.fecha_registro|date:"d/m/Y H:i" }}</span>
+                <span>Trazabilidad e Inmutabilidad Institucional</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

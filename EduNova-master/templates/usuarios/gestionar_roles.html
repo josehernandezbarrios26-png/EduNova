@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Roles{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Gestión de roles</h1>
+        <p class="text-muted mb-0">Asigna cualquier rol institucional a las cuentas del sistema.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Correo</th>
+                            <th>Rol actual</th>
+                            <th>Institución</th>
+                            <th class="text-end">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for perfil in perfiles %}
+                        <tr>
+                            <td>{{ perfil.usuario.get_full_name|default:perfil.usuario.username }}</td>
+                            <td>{{ perfil.usuario.email|default:'-' }}</td>
+                            <td>{{ perfil.rol.nombre|default:'Sin rol' }}</td>
+                            <td>{{ perfil.institucion.nombre|default:'-' }}</td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary" href="{% url 'gestionar_roles' %}?perfil={{ perfil.pk }}">
+                                    <i class="bi bi-pencil-square me-1"></i> Cambiar rol
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-muted py-4">No hay perfiles registrados.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        {% if form %}
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="h5">Cambiar rol</h2>
+                <p class="text-muted">{{ perfil_seleccionado.usuario.get_full_name|default:perfil_seleccionado.usuario.username }}</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="perfil_id" value="{{ perfil_seleccionado.pk }}">
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check2-circle me-1"></i> Guardar rol
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

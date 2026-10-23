@@ -1,0 +1,727 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Dashboard - EduNova{% endblock %}
+
+{% block content %}
+{% if dashboard_role == 'instructor' %}
+<div class="dashboard-hero mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+            <span class="dashboard-chip">Espacio del Instructor</span>
+            <h1 class="dashboard-title mb-2">Panel del Instructor SENA</h1>
+            <p class="dashboard-subtitle mb-0">
+                Fichas asignadas, seguimiento académico y control de su grupo de formación.
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="d-flex justify-content-lg-end flex-wrap gap-2">
+                <a href="{% url 'fichas_lista' %}" class="btn btn-edunova-primary">
+                    <i class="bi bi-folder2-open me-1"></i> Fichas asignadas
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-6">
+        <div class="edunova-card stat-card stat-card-primary p-3 p-xl-4 h-100 border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Fichas asignadas</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ total_fichas }}</h2>
+                    <span class="badge bg-primary bg-opacity-10 text-primary mt-2 small">Vigentes</span>
+                </div>
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                    <i class="bi bi-people fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-6">
+        <div class="edunova-card stat-card stat-card-info p-3 p-xl-4 h-100 border-start border-4 border-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Aprendices activos</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ matriculas|length }}</h2>
+                    <span class="badge bg-info bg-opacity-10 text-info mt-2 small">En su itinerario</span>
+                </div>
+                <div class="bg-info bg-opacity-10 p-3 rounded-circle text-info">
+                    <i class="bi bi-person-check fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="edunova-card">
+    <div class="edunova-card-header">
+        <span class="h6 mb-0 fw-bold"><i class="bi bi-folder2-open text-primary me-2"></i>Fichas asignadas</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-edunova table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Ficha</th>
+                    <th>Programa</th>
+                    <th>Institución</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ficha in fichas_asignadas %}
+                <tr>
+                    <td>{{ ficha.codigo_ficha }}</td>
+                    <td>{{ ficha.programa.denominacion }}</td>
+                    <td>{{ ficha.institucion.nombre }}</td>
+                    <td><span class="badge bg-success bg-opacity-10 text-success">{{ ficha.estado }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">No tiene fichas asignadas actualmente.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% elif dashboard_role == 'docente' %}
+<div class="dashboard-hero mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+            <span class="dashboard-chip">Espacio del docente</span>
+            <h1 class="dashboard-title mb-2">Panel docente de la institución</h1>
+            <p class="dashboard-subtitle mb-0">
+                Consulta la formación, fichas y estudiantes autorizados por la institución asignada.
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="d-flex justify-content-lg-end flex-wrap gap-2">
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">{{ institucion.nombre|default:'Sin institución' }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6">
+        <div class="edunova-card stat-card stat-card-primary p-3 h-100 border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Fichas</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ total_fichas }}</h2>
+                    <span class="badge bg-primary bg-opacity-10 text-primary mt-2 small">Asignadas</span>
+                </div>
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary"><i class="bi bi-journal-text fs-3"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="edunova-card stat-card stat-card-success p-3 h-100 border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Estudiantes</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ matriculas|length }}</h2>
+                    <span class="badge bg-success bg-opacity-10 text-success mt-2 small">Autorizados</span>
+                </div>
+                <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success"><i class="bi bi-people fs-3"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="edunova-card">
+    <div class="edunova-card-header">
+        <span class="h6 mb-0 fw-bold"><i class="bi bi-building text-primary me-2"></i>Fichas de la institución</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-edunova table-hover mb-0">
+            <thead><tr><th>Ficha</th><th>Programa</th><th>Estado</th></tr></thead>
+            <tbody>
+                {% for ficha in fichas %}
+                <tr><td>{{ ficha.codigo_ficha }}</td><td>{{ ficha.programa.denominacion }}</td><td><span class="badge bg-success bg-opacity-10 text-success">{{ ficha.estado }}</span></td></tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center text-muted py-4">No hay fichas asociadas a esta institución.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% elif dashboard_role == 'aprendiz' %}
+<div class="dashboard-hero mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+            <span class="dashboard-chip">Espacio personal</span>
+            <h1 class="dashboard-title mb-2">Mi panel académico</h1>
+            <p class="dashboard-subtitle mb-0">
+                Consulta tus matrículas, información y boletines personales autorizados.
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="d-flex justify-content-lg-end flex-wrap gap-2">
+                <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">Aprendiz</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="edunova-card">
+    <div class="edunova-card-header">
+        <span class="h6 mb-0 fw-bold"><i class="bi bi-patch-check text-primary me-2"></i>Mis matrículas</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-edunova table-hover mb-0">
+            <thead><tr><th>Ficha</th><th>Programa</th><th>Institución</th><th>Estado</th></tr></thead>
+            <tbody>
+                {% for matricula in matriculas %}
+                <tr><td>{{ matricula.ficha.codigo_ficha }}</td><td>{{ matricula.ficha.programa.denominacion }}</td><td>{{ matricula.ficha.institucion.nombre }}</td><td><span class="badge bg-success bg-opacity-10 text-success">{{ matricula.estado_formacion }}</span></td></tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4">No tienes matrículas registradas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% else %}
+<div class="dashboard-hero mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+            <span class="dashboard-chip">Monitoreo operativo</span>
+            <h1 class="dashboard-title mb-2">Panel de Control General</h1>
+            <p class="dashboard-subtitle mb-0">
+                Seguimiento a la Integración con la Media Técnica · Regional Magdalena
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="d-flex justify-content-lg-end flex-wrap gap-2">
+                <a href="{% url 'seguimiento_nuevo' %}" class="btn btn-edunova-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Nueva Visita
+                </a>
+                <a href="{% url 'instituciones_crear' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-building-add me-1"></i> Vincular Colegio
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4 Tarjetas de Indicadores Clave en Tiempo Real -->
+<div class="row g-3 mb-4">
+    <!-- Colegios Activos -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="edunova-card stat-card stat-card-primary p-3 p-xl-4 h-100 border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Colegios Activos</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ total_colegios }}</h2>
+                    <span class="badge bg-primary bg-opacity-10 text-primary mt-2 small">En Convenio</span>
+                </div>
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                    <i class="bi bi-building fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fichas en Ejecución -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="edunova-card stat-card stat-card-info p-3 p-xl-4 h-100 border-start border-4 border-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Fichas Técnicas</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ total_fichas }}</h2>
+                    <span class="badge bg-info bg-opacity-10 text-info mt-2 small">En Ejecución</span>
+                </div>
+                <div class="bg-info bg-opacity-10 p-3 rounded-circle text-info">
+                    <i class="bi bi-collection fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aprendices Matriculados -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="edunova-card stat-card stat-card-success p-3 p-xl-4 h-100 border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Aprendices</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ total_aprendices }}</h2>
+                    <span class="badge bg-success bg-opacity-10 text-success mt-2 small">Grados 10° y 11°</span>
+                </div>
+                <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
+                    <i class="bi bi-people fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tasa de Aprobación -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="edunova-card p-3 p-xl-4 h-100 border-start border-4 border-warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Tasa de Aprobación</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ porcentaje_aprobacion }}%</h2>
+                    <span class="badge bg-warning bg-opacity-10 text-warning mt-2 small">
+                        {{ total_aprobados }} Aprobados / {{ total_no_aprobados }} Por Mejorar
+                    </span>
+                </div>
+                <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                    <i class="bi bi-pie-chart fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="edunova-card stat-card stat-card-danger p-3 p-xl-4 h-100 border-start border-4 border-danger">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Fichas por vencer</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ fichas_por_vencer|length }}</h2>
+                    <span class="badge bg-danger bg-opacity-10 text-danger mt-2 small">Próximo mes</span>
+                </div>
+                <div class="bg-danger bg-opacity-10 p-3 rounded-circle text-danger">
+                    <i class="bi bi-exclamation-triangle fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="edunova-card stat-card stat-card-alerta p-3 p-xl-4 h-100 border-start border-4 border-warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Instituciones con alerta</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ instituciones_con_alerta|length }}</h2>
+                    <span class="badge bg-warning bg-opacity-10 text-warning mt-2 small">Sin seguimiento 30 días</span>
+                </div>
+                <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                    <i class="bi bi-bell fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tablas de Registros Recientes -->
+<div class="row g-4">
+    <!-- Últimas Bitácoras de Seguimiento -->
+    <div class="col-lg-7">
+        <div class="edunova-card h-100">
+            <div class="edunova-card-header d-flex justify-content-between align-items-center">
+                <span class="h6 mb-0 fw-bold"><i class="bi bi-journal-text text-primary me-2"></i>Últimas Bitácoras de Seguimiento</span>
+                <a href="{% url 'seguimiento_lista' %}" class="btn btn-sm btn-link text-decoration-none">Ver todas &rarr;</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-edunova table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Ficha / Colegio</th>
+                            <th>Tipo</th>
+                            <th>Instructor</th>
+                            <th>Novedad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in ultimas_bitacoras %}
+                            <tr>
+                                <td class="fw-semibold text-nowrap">{{ b.fecha_visita|date:"d/m/Y" }}</td>
+                                <td>
+                                    <strong>Ficha {{ b.ficha.codigo_ficha }}</strong><br>
+                                    <small class="text-muted">{{ b.ficha.institucion.nombre|truncatechars:28 }}</small>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ b.tipo_seguimiento }}</span></td>
+                                <td>{{ b.instructor.get_full_name|default:b.instructor.username }}</td>
+                                <td>
+                                    {% if b.compromisos %}
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Con Acuerdo</span>
+                                    {% else %}
+                                        <span class="badge bg-success bg-opacity-10 text-success">Normal</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox fs-3 d-block mb-1"></i>
+                                    No hay bitácoras de visita registradas aún.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fichas Recientes -->
+    <div class="col-lg-5">
+        <div class="edunova-card h-100">
+            <div class="edunova-card-header d-flex justify-content-between align-items-center">
+                <span class="h6 mb-0 fw-bold"><i class="bi bi-collection text-primary me-2"></i>Fichas Técnicas Recientes</span>
+                <a href="{% url 'fichas_lista' %}" class="btn btn-sm btn-link text-decoration-none">Ver todas &rarr;</a>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for f in fichas_recientes %}
+                    <a href="{% url 'fichas_detalle' f.id %}" class="list-group-item list-group-item-action p-3">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                            <h6 class="mb-0 fw-bold text-primary">Ficha {{ f.codigo_ficha }}</h6>
+                            <span class="badge {% if f.periodo_cerrado %}bg-secondary{% else %}bg-success{% endif %}">
+                                {% if f.periodo_cerrado %}Cerrada{% else %}Abierta{% endif %}
+                            </span>
+                        </div>
+                        <p class="mb-1 text-dark small fw-medium">{{ f.programa.denominacion }}</p>
+                        <small class="text-muted">
+                            <i class="bi bi-geo-alt me-1"></i>{{ f.institucion.nombre|truncatechars:35 }} ({{ f.institucion.municipio }})
+                        </small>
+                    </a>
+                {% empty %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox fs-3 d-block mb-1"></i>
+                        No hay fichas registradas aún.
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-1 mb-4">
+    <div class="col-lg-6">
+        <div class="edunova-card h-100">
+            <div class="edunova-card-header">
+                <span class="h6 mb-0 fw-bold"><i class="bi bi-hourglass-split text-primary me-2"></i>Fichas por vencer</span>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for ficha in fichas_por_vencer %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Ficha {{ ficha.codigo_ficha }}</strong><br>
+                                <small class="text-muted">{{ ficha.institucion.nombre }}</small>
+                            </div>
+                            <span class="badge bg-danger">{{ ficha.fecha_fin|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="list-group-item text-muted text-center py-3">No hay fichas próximas a vencer.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="edunova-card h-100">
+            <div class="edunova-card-header">
+                <span class="h6 mb-0 fw-bold"><i class="bi bi-shield-exclamation text-primary me-2"></i>Instituciones con alerta</span>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for item in instituciones_con_alerta %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ item.institucion.nombre }}</strong><br>
+                                <small class="text-muted">Sin seguimiento desde {{ item.dias_sin_seguimiento }} días</small>
+                            </div>
+                            <span class="badge bg-warning text-dark">Alerta</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="list-group-item text-muted text-center py-3">No hay instituciones con alerta de seguimiento.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECCIÓN DE REPORTES Y VISUALIZACIÓN
+════════════════════════════════════════════════════════════ -->
+<div class="row mt-2 mb-3 align-items-center">
+    <div class="col">
+        <h5 class="fw-bold mb-0 mt-4" style="color:#6D28D9;">
+            <i class="bi bi-bar-chart-line me-2"></i>Reportes y Visualización
+        </h5>
+        <p class="text-muted small mb-0">Análisis estadístico del proceso de articulación con la Media Técnica</p>
+    </div>
+</div>
+
+<!-- Gráfica 1 (fila completa): Aprobados vs No Aprobados por Ficha -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="edunova-card">
+            <div class="edunova-card-header d-flex justify-content-between align-items-center">
+                <span class="h6 mb-0 fw-bold">
+                    <i class="bi bi-bar-chart-fill me-2" style="color:#8B5CF6;"></i>
+                    Aprobados vs No Aprobados por Ficha
+                </span>
+                <span class="badge bg-light text-muted border small">Fichas en ejecución</span>
+            </div>
+            <div class="p-3" style="height: 320px;">
+                <canvas id="chartFichasAprobacion"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráfica 2 y 3: dona + barras horizontales -->
+<div class="row g-4 mb-4">
+    <!-- Gráfica 2: Distribución de estados de aprendices (dona) -->
+    <div class="col-lg-5">
+        <div class="edunova-card h-100">
+            <div class="edunova-card-header">
+                <span class="h6 mb-0 fw-bold">
+                    <i class="bi bi-pie-chart-fill me-2" style="color:#8B5CF6;"></i>
+                    Estado de Aprendices
+                </span>
+            </div>
+            <div class="p-3 d-flex align-items-center justify-content-center" style="height: 290px;">
+                <canvas id="chartEstadosAprendices"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfica 3: Fichas activas por municipio (barras horizontales) -->
+    <div class="col-lg-7">
+        <div class="edunova-card h-100">
+            <div class="edunova-card-header">
+                <span class="h6 mb-0 fw-bold">
+                    <i class="bi bi-geo-alt-fill me-2" style="color:#8B5CF6;"></i>
+                    Fichas Activas por Municipio
+                </span>
+            </div>
+            <div class="p-3" style="height: 290px;">
+                <canvas id="chartMunicipios"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-hero {
+    background: linear-gradient(135deg, rgba(109, 40, 217, 0.12), rgba(139, 92, 246, 0.04));
+    border: 1px solid rgba(139, 92, 246, 0.16);
+    border-radius: 22px;
+    padding: 1.75rem 1.5rem;
+    box-shadow: 0 12px 30px rgba(109, 40, 217, 0.08);
+}
+
+.dashboard-chip {
+    display: inline-block;
+    background: linear-gradient(135deg, #6D28D9, #8B5CF6);
+    color: #fff;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+}
+
+.dashboard-title {
+    font-size: clamp(2rem, 2vw, 2.6rem);
+    font-weight: 800;
+    color: #1e1b4b;
+    letter-spacing: -0.04em;
+}
+
+.dashboard-subtitle {
+    color: #4b5563;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,245,255,0.98));
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 110px;
+    height: 110px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 50%;
+    transform: translate(-28px, -35px);
+}
+
+.stat-card .bg-primary,
+.stat-card .bg-info,
+.stat-card .bg-success,
+.stat-card .bg-warning,
+.stat-card .bg-danger {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35);
+}
+
+.stat-card h2 {
+    font-size: clamp(2rem, 2.4vw, 2.5rem);
+    letter-spacing: -0.06em;
+}
+
+.edunova-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 30px rgba(15, 23, 42, 0.08);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+// Paleta de colores EduNova basada en #8B5CF6
+const PURPLE      = '#8B5CF6';
+const PURPLE_DARK = '#7C3AED';
+const PURPLE_LIGHT= '#C4B5FD';
+const GREEN       = '#059669';
+const RED         = '#EF4444';
+const AMBER       = '#F59E0B';
+const BLUE        = '#3B82F6';
+const SLATE       = '#94A3B8';
+
+// Opciones comunes
+const commonFont = { family: 'Inter, sans-serif', size: 12 };
+
+// ── Gráfica 1: Aprobados vs No Aprobados por Ficha ──────────────
+const ctxFichas = document.getElementById('chartFichasAprobacion');
+if (ctxFichas) {
+    new Chart(ctxFichas, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_fichas_labels|safe }},
+            datasets: [
+                {
+                    label: 'Aprobados (A)',
+                    data: {{ chart_fichas_aprobados|safe }},
+                    backgroundColor: 'rgba(5, 150, 105, 0.8)',
+                    borderColor: GREEN,
+                    borderWidth: 1.5,
+                    borderRadius: 6,
+                },
+                {
+                    label: 'No Aprobados (D)',
+                    data: {{ chart_fichas_no_aprobados|safe }},
+                    backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                    borderColor: RED,
+                    borderWidth: 1.5,
+                    borderRadius: 6,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { font: commonFont, padding: 16 } },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: commonFont } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { font: commonFont, precision: 0 },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                }
+            }
+        }
+    });
+}
+
+// ── Gráfica 2: Distribución de estados de aprendices (dona) ──────
+const ctxEstados = document.getElementById('chartEstadosAprendices');
+if (ctxEstados) {
+    const estadoColores = [PURPLE, GREEN, AMBER, BLUE, SLATE];
+    new Chart(ctxEstados, {
+        type: 'doughnut',
+        data: {
+            labels: {{ chart_estados_labels|safe }},
+            datasets: [{
+                data: {{ chart_estados_data|safe }},
+                backgroundColor: estadoColores,
+                borderColor: '#FFFFFF',
+                borderWidth: 3,
+                hoverOffset: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: commonFont, padding: 12, usePointStyle: true }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${ctx.label}: ${ctx.parsed} aprendices`
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ── Gráfica 3: Fichas activas por municipio (barras horizontales) ─
+const ctxMunicipio = document.getElementById('chartMunicipios');
+if (ctxMunicipio) {
+    new Chart(ctxMunicipio, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_municipio_labels|safe }},
+            datasets: [{
+                label: 'Fichas activas',
+                data: {{ chart_municipio_data|safe }},
+                backgroundColor: 'rgba(139, 92, 246, 0.75)',
+                borderColor: PURPLE_DARK,
+                borderWidth: 1.5,
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${ctx.parsed.x} ficha(s)`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: { font: commonFont, precision: 0 },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                y: { grid: { display: false }, ticks: { font: commonFont } }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

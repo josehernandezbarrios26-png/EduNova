@@ -1,0 +1,242 @@
+﻿/* ==============================================================================
+   PROYECTO FORMATIVO: SISTEMAS DE INFORMACIÓN Y DESARROLLO DE SOFTWARE EN EL MAGDALENA
+   SOFTWARE: EduNova (Sistema de Integración Técnica Education)
+   CENTRO: Centro de Logística y Promoción Ecoturística del Magdalena - ADSI 228106
+   HOJA DE ESTILOS PERSONALIZADA - SISTEMA DE DISEÑO EduNova
+============================================================================== */
+
+:root {
+  --edunova-primary: #8B5CF6;
+  --edunova-primary-dark: #7C3AED;
+  --edunova-secondary: #6D28D9;
+  --edunova-accent: #A78BFA;
+  --edunova-success: #059669;
+  --edunova-warning: #D97706;
+  --edunova-danger: #DC2626;
+  --edunova-bg-light: #F5F3FF;
+  --edunova-card-bg: #FFFFFF;
+  --edunova-border: #EDE9FE;
+  --edunova-text-main: #1E1B4B;
+  --edunova-text-muted: #6B7280;
+  --edunova-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  font-family: var(--edunova-font);
+  background:
+    radial-gradient(circle at top left, rgba(49, 196, 190, 0.14), transparent 28%),
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.22), transparent 30%),
+    linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+  color: var(--edunova-text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.edunova-shell {
+  display: flex;
+  min-height: calc(100vh - 0px);
+  width: 100%;
+}
+
+.edunova-sidebar {
+  width: 280px;
+  background: rgba(15, 23, 42, 0.94);
+  border-right: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 16px 0 40px rgba(15, 23, 42, 0.18);
+  padding: 1.3rem 1rem 1rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.edunova-sidebar .brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.75rem 0.8rem 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  margin-bottom: 1.1rem;
+}
+
+.edunova-sidebar .brand-wrap img {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.edunova-sidebar .brand-wrap .brand-label {
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.edunova-sidebar .sidebar-section {
+  margin-top: 1rem;
+}
+
+.edunova-sidebar .sidebar-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.9);
+  padding: 0 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+.edunova-sidebar .nav-link-side {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  color: rgba(226, 232, 240, 0.9);
+  text-decoration: none;
+  padding: 0.8rem 0.9rem;
+  border-radius: 16px;
+  margin-bottom: 0.4rem;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.edunova-sidebar .nav-link-side i {
+  width: 18px;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.edunova-sidebar .nav-link-side:hover,
+.edunova-sidebar .nav-link-side.active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(168, 85, 247, 0.14));
+  color: #fff;
+  border-color: rgba(125, 211, 252, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.14);
+}
+
+.edunova-sidebar .nav-link-side .label {
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+
+.edunova-sidebar .sidebar-footer {
+  margin-top: 1.3rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.28);
+}
+
+.edunova-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.navbar-edunova {
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 9px 30px rgba(15, 23, 42, 0.12);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.navbar-edunova .navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #FFFFFF !important;
+}
+
+.badge-sena-institution {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Tarjetas y Contenedores */
+.edunova-card {
+  background-color: var(--edunova-card-bg);
+  border: 1px solid var(--edunova-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.edunova-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+.edunova-card-header {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--edunova-border);
+  padding: 1.25rem 1.5rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  font-weight: 600;
+}
+
+/* Botones con estilo propio */
+.btn-edunova-primary {
+  background-color: var(--edunova-primary);
+  border-color: var(--edunova-primary);
+  color: #FFFFFF;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.6rem 1.25rem;
+  transition: all 0.2s;
+}
+
+.btn-edunova-primary:hover {
+  background-color: var(--edunova-primary-dark);
+  border-color: var(--edunova-primary-dark);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.btn-edunova-success {
+  background-color: var(--edunova-success);
+  border-color: var(--edunova-success);
+  color: #FFFFFF;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+/* Tablas con diseño ergonómico */
+.table-edunova {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--edunova-border);
+}
+
+.table-edunova thead th {
+  background-color: #F5F3FF;
+  color: #5B21B6;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--edunova-border);
+  padding: 0.85rem 1rem;
+}
+
+.table-edunova tbody td {
+  padding: 0.85rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #F5F3FF;
+}
+
+/* Pie de página */
+.footer-edunova {
+  background-color: #FFFFFF;
+  border-top: 1px solid var(--edunova-border);
+  padding: 1.5rem 0;
+  margin-top: auto;
+  font-size: 0.85rem;
+  color: var(--edunova-text-muted);
+}

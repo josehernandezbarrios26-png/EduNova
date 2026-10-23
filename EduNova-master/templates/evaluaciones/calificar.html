@@ -1,0 +1,166 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Calificación de Resultados de Aprendizaje - EduNova{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1 text-dark">Sábana de Calificación de Resultados (RAP)</h1>
+        <p class="text-muted small mb-0">Asignación de juicios oficiales cualitativos 'A' o 'D' (RN-003) con control de periodos (RN-004)</p>
+    </div>
+</div>
+
+<!-- Selector de Ficha y RAP -->
+<div class="edunova-card p-4 mb-4">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label small fw-semibold">1. Seleccione la Ficha Técnica:</label>
+            <select name="ficha" class="form-select" onchange="this.form.submit()">
+                <option value="">-- Seleccionar Ficha --</option>
+                {% for f in fichas %}
+                    <option value="{{ f.id }}" {% if ficha_actual and ficha_actual.id == f.id %}selected{% endif %}>
+                        Ficha {{ f.codigo_ficha }} — {{ f.programa.denominacion }} ({{ f.institucion.nombre }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-5">
+            <label class="form-label small fw-semibold">2. Seleccione el Resultado de Aprendizaje (RAP):</label>
+            <select name="rap" class="form-select" {% if not ficha_actual %}disabled{% endif %}>
+                <option value="">-- Seleccionar Resultado a Evaluar --</option>
+                {% for r in raps %}
+                    <option value="{{ r.id }}" {% if rap_actual and rap_actual.id == r.id %}selected{% endif %}>
+                        {{ r.codigo }} — {{ r.descripcion|truncatechars:55 }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-edunova-primary w-100 fw-semibold" {% if not ficha_actual %}disabled{% endif %}>
+                <i class="bi bi-filter me-1"></i> Cargar Lista
+            </button>
+        </div>
+    </form>
+</div>
+
+{% if ficha_actual and rap_actual %}
+    <!-- Alerta de Bloqueo por Cierre de Periodo (RN-004) -->
+    {% if ficha_actual.periodo_cerrado %}
+        <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-lock-fill fs-3 me-3"></i>
+            <div>
+                <strong>PERIODO EVALUATIVO CERRADO (Regla RN-004):</strong><br>
+                La Coordinación de Articulación ha formalizado el cierre de este periodo para la Ficha {{ ficha_actual.codigo_ficha }}. 
+                Las notas no pueden ser modificadas a menos que se reabra el periodo formalmente.
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Sábana de Notas -->
+    <div class="edunova-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 border-bottom pb-3">
+            <div>
+                <span class="badge bg-primary fs-6">{{ rap_actual.codigo }}</span>
+                <h5 class="fw-bold mb-0 mt-1">{{ rap_actual.descripcion }}</h5>
+                <small class="text-muted">Competencia: {{ rap_actual.competencia.codigo }} - {{ rap_actual.competencia.descripcion }}</small>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-light text-dark border">{{ aprendices_datos|length }} Aprendices</span>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="table-responsive mb-4">
+                <table class="table table-edunova table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">No.</th>
+                            <th>Documento</th>
+                            <th>Apellidos y Nombres</th>
+                            <th style="width: 280px;">Juicio Evaluativo (RN-003)</th>
+                            <th>Retroalimentación Pedagógica</th>
+                            <th style="width: 110px;">Boletín</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in aprendices_datos %}
+                            <tr>
+                                <td class="fw-bold text-muted">{{ forloop.counter }}</td>
+                                <td>{{ item.matricula.aprendiz.perfil.tipo_documento }} {{ item.matricula.aprendiz.perfil.numero_documento }}</td>
+                                <td class="fw-semibold">{{ item.matricula.aprendiz.last_name }}, {{ item.matricula.aprendiz.first_name }}</td>
+                                <td>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" 
+                                                   name="juicio_{{ item.matricula.id }}" 
+                                                   id="juicio_a_{{ item.matricula.id }}" 
+                                                   value="A" 
+                                                   {% if item.juicio_actual == 'A' %}checked{% endif %}
+                                                   {% if ficha_actual.periodo_cerrado %}disabled{% endif %}>
+                                            <label class="form-check-label text-success fw-bold" for="juicio_a_{{ item.matricula.id }}">
+                                                A (Aprobado)
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" 
+                                                   name="juicio_{{ item.matricula.id }}" 
+                                                   id="juicio_d_{{ item.matricula.id }}" 
+                                                   value="D" 
+                                                   {% if item.juicio_actual == 'D' %}checked{% endif %}
+                                                   {% if ficha_actual.periodo_cerrado %}disabled{% endif %}>
+                                            <label class="form-check-label text-danger fw-bold" for="juicio_d_{{ item.matricula.id }}">
+                                                D (Por Mejorar)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="text" 
+                                           name="obs_{{ item.matricula.id }}" 
+                                           value="{{ item.observacion_actual }}" 
+                                           class="form-control form-control-sm" 
+                                           placeholder="Observación u orientación al aprendiz..."
+                                           {% if ficha_actual.periodo_cerrado %}disabled{% endif %}>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'evaluaciones_boletin' item.matricula.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-file-earmark-text me-1"></i> Ver
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No hay aprendices matriculados en esta ficha.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if not ficha_actual.periodo_cerrado and aprendices_datos %}
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <button type="submit" class="btn btn-edunova-primary px-4 fw-semibold">
+                        <i class="bi bi-floppy-fill me-1"></i> Guardar Sábana de Calificaciones
+                    </button>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+{% elif ficha_actual %}
+    <div class="edunova-card p-5 text-center text-muted">
+        <i class="bi bi-arrow-up-circle fs-1 text-primary d-block mb-2"></i>
+        <h5>Seleccione un Resultado de Aprendizaje (RAP) arriba para desplegar la sábana de notas.</h5>
+    </div>
+{% else %}
+    <div class="edunova-card p-5 text-center text-muted">
+        <i class="bi bi-collection fs-1 text-secondary d-block mb-2"></i>
+        <h5>Seleccione una Ficha Técnica de Media Técnica para comenzar la evaluación.</h5>
+    </div>
+{% endif %}
+{% endblock %}

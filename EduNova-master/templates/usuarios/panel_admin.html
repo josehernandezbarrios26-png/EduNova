@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel Administrador - EduNova{% endblock %}
+
+{% block content %}
+<div class="dashboard-hero mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+            <span class="dashboard-chip">Administración General</span>
+            <h1 class="dashboard-title mb-2">Panel del Administrador General</h1>
+            <p class="dashboard-subtitle mb-0">
+                Gestión completa de usuarios, instituciones y configuración del sistema EduNova.
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="d-flex justify-content-lg-end flex-wrap gap-2">
+                <a href="{% url 'lista_usuarios' %}" class="btn btn-edunova-primary">
+                    <i class="bi bi-people me-1"></i> Gestionar Usuarios
+                </a>
+                <a href="{% url 'instituciones_lista' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-building me-1"></i> Instituciones
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tarjetas de indicadores globales -->
+<div class="row g-3 mb-4">
+    <!-- Total Usuarios -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="edunova-card stat-card stat-card-primary p-3 p-xl-4 h-100 border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Usuarios</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ total_usuarios }}</h2>
+                    <span class="badge bg-primary bg-opacity-10 text-primary mt-2 small">{{ total_usuarios_activos }} activos</span>
+                </div>
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                    <i class="bi bi-people fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instituciones -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="edunova-card stat-card stat-card-info p-3 p-xl-4 h-100 border-start border-4 border-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Instituciones</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ total_instituciones }}</h2>
+                    <span class="badge bg-info bg-opacity-10 text-info mt-2 small">{{ total_instituciones_activas }} activas</span>
+                </div>
+                <div class="bg-info bg-opacity-10 p-3 rounded-circle text-info">
+                    <i class="bi bi-building fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fichas en ejecución -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="edunova-card stat-card stat-card-success p-3 p-xl-4 h-100 border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Fichas Activas</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ total_fichas }}</h2>
+                    <span class="badge bg-success bg-opacity-10 text-success mt-2 small">En ejecución</span>
+                </div>
+                <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
+                    <i class="bi bi-collection fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tasa de aprobación -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="edunova-card p-3 p-xl-4 h-100 border-start border-4 border-warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small fw-semibold text-uppercase">Aprobación</span>
+                    <h2 class="display-6 fw-bold mb-0 mt-1 text-dark">{{ porcentaje_aprobacion }}%</h2>
+                    <span class="badge bg-warning bg-opacity-10 text-warning mt-2 small">
+                        {{ total_aprobados }} A / {{ total_no_aprobados }} D
+                    </span>
+                </div>
+                <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                    <i class="bi bi-pie-chart fs-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Distribución de usuarios por rol -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-5">
+        <div class="edunova-card h-100">
+            <div class="edunova-card-header">
+                <span class="h6 mb-0 fw-bold"><i class="bi bi-people text-primary me-2"></i>Usuarios por Rol</span>
+            </div>
+            <div class="p-3">
+                {% for item in roles_distribution %}
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-circle" style="width:32px;height:32px;display:grid;place-items:center;">{{ item.total }}</span>
+                        <span class="fw-medium">{{ item.rol__nombre|default:"Sin rol" }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center py-3">No hay datos disponibles.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Accesos rápidos -->
+    <div class="col-lg-7">
+        <div class="edunova-card h-100">
+            <div class="edunova-card-header">
+                <span class="h6 mb-0 fw-bold"><i class="bi bi-grid text-primary me-2"></i>Accesos Rápidos</span>
+            </div>
+            <div class="p-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="{% url 'lista_usuarios' %}" class="text-decoration-none">
+                            <div class="edunova-card p-3 text-center h-100" style="cursor:pointer;">
+                                <i class="bi bi-person-plus-fill fs-2 text-primary"></i>
+                                <p class="fw-semibold mt-2 mb-0 text-dark">Gestionar Usuarios</p>
+                                <small class="text-muted">Crear, editar y activar cuentas</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'gestionar_roles' %}" class="text-decoration-none">
+                            <div class="edunova-card p-3 text-center h-100" style="cursor:pointer;">
+                                <i class="bi bi-person-gear fs-2 text-primary"></i>
+                                <p class="fw-semibold mt-2 mb-0 text-dark">Roles y Permisos</p>
+                                <small class="text-muted">Asignar roles a usuarios</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'instituciones_lista' %}" class="text-decoration-none">
+                            <div class="edunova-card p-3 text-center h-100" style="cursor:pointer;">
+                                <i class="bi bi-building-fill fs-2 text-primary"></i>
+                                <p class="fw-semibold mt-2 mb-0 text-dark">Instituciones</p>
+                                <small class="text-muted">Sedes y colegios articulados</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'fichas_lista' %}" class="text-decoration-none">
+                            <div class="edunova-card p-3 text-center h-100" style="cursor:pointer;">
+                                <i class="bi bi-folder2-open fs-2 text-primary"></i>
+                                <p class="fw-semibold mt-2 mb-0 text-dark">Fichas Técnicas</p>
+                                <small class="text-muted">Supervisión académica global</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'seguimiento_lista' %}" class="text-decoration-none">
+                            <div class="edunova-card p-3 text-center h-100" style="cursor:pointer;">
+                                <i class="bi bi-journal-check fs-2 text-primary"></i>
+                                <p class="fw-semibold mt-2 mb-0 text-dark">Seguimiento</p>
+                                <small class="text-muted">Bitácoras de visitas</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'evaluaciones_boletines' %}" class="text-decoration-none">
+                            <div class="edunova-card p-3 text-center h-100" style="cursor:pointer;">
+                                <i class="bi bi-patch-check fs-2 text-primary"></i>
+                                <p class="fw-semibold mt-2 mb-0 text-dark">Boletines</p>
+                                <small class="text-muted">Reportes académicos</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actividad reciente -->
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="edunova-card h-100">
+            <div class="edunova-card-header d-flex justify-content-between align-items-center">
+                <span class="h6 mb-0 fw-bold"><i class="bi bi-clock-history text-primary me-2"></i>Actividad Reciente</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-edunova table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Ficha / Colegio</th>
+                            <th>Instructor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in seguimientos_recientes %}
+                        <tr>
+                            <td class="fw-semibold text-nowrap">{{ b.fecha_visita|date:"d/m/Y" }}</td>
+                            <td>
+                                <strong>Ficha {{ b.ficha.codigo_ficha }}</strong><br>
+                                <small class="text-muted">{{ b.ficha.institucion.nombre|truncatechars:30 }}</small>
+                            </td>
+                            <td>{{ b.instructor.get_full_name|default:b.instructor.username }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox fs-3 d-block mb-1"></i>
+                                No hay actividad reciente registrada.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="edunova-card h-100">
+            <div class="edunova-card-header d-flex justify-content-between align-items-center">
+                <span class="h6 mb-0 fw-bold"><i class="bi bi-collection text-primary me-2"></i>Fichas Recientes</span>
+                <a href="{% url 'fichas_lista' %}" class="btn btn-sm btn-link text-decoration-none">Ver todas &rarr;</a>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for f in fichas_recientes %}
+                <a href="{% url 'fichas_detalle' f.id %}" class="list-group-item list-group-item-action p-3">
+                    <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                        <h6 class="mb-0 fw-bold text-primary">Ficha {{ f.codigo_ficha }}</h6>
+                        <span class="badge {% if f.periodo_cerrado %}bg-secondary{% else %}bg-success{% endif %}">
+                            {% if f.periodo_cerrado %}Cerrada{% else %}Abierta{% endif %}
+                        </span>
+                    </div>
+                    <p class="mb-1 text-dark small fw-medium">{{ f.programa.denominacion }}</p>
+                    <small class="text-muted">
+                        <i class="bi bi-geo-alt me-1"></i>{{ f.institucion.nombre|truncatechars:35 }} ({{ f.institucion.municipio }})
+                    </small>
+                </a>
+                {% empty %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-3 d-block mb-1"></i>
+                    No hay fichas registradas.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-hero {
+    background: linear-gradient(135deg, rgba(109, 40, 217, 0.12), rgba(139, 92, 246, 0.04));
+    border: 1px solid rgba(139, 92, 246, 0.16);
+    border-radius: 22px;
+    padding: 1.75rem 1.5rem;
+    box-shadow: 0 12px 30px rgba(109, 40, 217, 0.08);
+}
+.dashboard-chip {
+    display: inline-block;
+    background: linear-gradient(135deg, #6D28D9, #8B5CF6);
+    color: #fff;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+}
+.dashboard-title {
+    font-size: clamp(2rem, 2vw, 2.6rem);
+    font-weight: 800;
+    color: #1e1b4b;
+    letter-spacing: -0.04em;
+}
+.dashboard-subtitle {
+    color: #4b5563;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,245,255,0.98));
+}
+.edunova-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 30px rgba(15, 23, 42, 0.08);
+}
+</style>
+{% endblock %}

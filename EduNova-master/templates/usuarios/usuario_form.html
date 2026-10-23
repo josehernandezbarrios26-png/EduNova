@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} - EduNova{% endblock %}
+
+{% block content %}
+<div class="dashboard-hero mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+            <span class="dashboard-chip">Administración</span>
+            <h1 class="dashboard-title mb-2">{{ titulo }}</h1>
+            <p class="dashboard-subtitle mb-0">
+                {% if perfil %}
+                Editando los datos de un usuario existente. Los cambios se aplican inmediatamente.
+                {% else %}
+                Complete los datos para registrar un nuevo usuario en el sistema.
+                {% endif %}
+            </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <a href="{% url 'lista_usuarios' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-1"></i> Volver al listado
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="edunova-card">
+            <div class="edunova-card-header">
+                <span class="h6 mb-0 fw-bold">
+                    <i class="bi bi-person-fill text-primary me-2"></i>
+                    {% if perfil %}Datos del usuario{% else %}Nuevo usuario{% endif %}
+                </span>
+            </div>
+            <div class="p-4">
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        {% if not perfil %}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.username.label }}</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.password.label }}</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors.0 }}{% endif %}
+                        </div>
+                        {% endif %}
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors.0 }}{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors.0 }}{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{{ form.telefono.label }}</label>
+                            {{ form.telefono }}
+                            {% if form.telefono.errors %}<div class="text-danger small mt-1">{{ form.telefono.errors.0 }}{% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">{{ form.tipo_documento.label }}</label>
+                            {{ form.tipo_documento }}
+                            {% if form.tipo_documento.errors %}<div class="text-danger small mt-1">{{ form.tipo_documento.errors.0 }}{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">{{ form.numero_documento.label }}</label>
+                            {{ form.numero_documento }}
+                            {% if form.numero_documento.errors %}<div class="text-danger small mt-1">{{ form.numero_documento.errors.0 }}{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">{{ form.rol.label }}</label>
+                            {{ form.rol }}
+                            {% if form.rol.errors %}<div class="text-danger small mt-1">{{ form.rol.errors.0 }}{% endif %}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">{{ form.institucion.label }}</label>
+                            {{ form.institucion }}
+                            {% if form.institucion.errors %}<div class="text-danger small mt-1">{{ form.institucion.errors.0 }}{% endif %}
+                            <small class="text-muted">Obligatorio para Docentes Enlace. Opcional para los demás roles.</small>
+                        </div>
+
+                        {% if perfil %}
+                        <div class="col-12">
+                            <div class="form-check">
+                                {{ form.esta_activo }}
+                                <label class="form-check-label fw-semibold ms-1" for="{{ form.esta_activo.id_for_label }}">{{ form.esta_activo.label }}</label>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-edunova-primary">
+                            <i class="bi bi-check-circle me-1"></i>
+                            {% if perfil %}Guardar Cambios{% else %}Crear Usuario{% endif %}
+                        </button>
+                        <a href="{% url 'lista_usuarios' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-hero {
+    background: linear-gradient(135deg, rgba(109, 40, 217, 0.12), rgba(139, 92, 246, 0.04));
+    border: 1px solid rgba(139, 92, 246, 0.16);
+    border-radius: 22px;
+    padding: 1.75rem 1.5rem;
+    box-shadow: 0 12px 30px rgba(109, 40, 217, 0.08);
+}
+.dashboard-chip {
+    display: inline-block;
+    background: linear-gradient(135deg, #6D28D9, #8B5CF6);
+    color: #fff;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+}
+.dashboard-title {
+    font-size: clamp(2rem, 2vw, 2.6rem);
+    font-weight: 800;
+    color: #1e1b4b;
+    letter-spacing: -0.04em;
+}
+.dashboard-subtitle {
+    color: #4b5563;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+</style>
+{% endblock %}
