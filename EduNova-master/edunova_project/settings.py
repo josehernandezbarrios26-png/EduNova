@@ -14,12 +14,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def _local_hosts():
-    """Genera una lista segura de hosts locales, Render y de red privada para desarrollo."""
-    hosts = ['localhost', '127.0.0.1', '[::1]', '.onrender.com']
+    """Genera una lista segura de hosts locales, Render, Railway y de red privada."""
+    hosts = ['localhost', '127.0.0.1', '[::1]', '.onrender.com', '.railway.app', '.up.railway.app']
 
     render_hostname = config('RENDER_EXTERNAL_HOSTNAME', default=None)
     if render_hostname:
         hosts.append(render_hostname)
+
+    railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
+    if railway_domain:
+        hosts.append(railway_domain)
 
     env_hosts = config('ALLOWED_HOSTS', default='', cast=Csv())
     hosts.extend(env_hosts)
@@ -44,13 +48,19 @@ def _local_hosts():
 
 
 def _csrf_trusted_origins():
-    """Registra orígenes locales y de Render para peticiones seguras."""
+    """Registra orígenes locales, Render y Railway para peticiones seguras."""
     origins = list(config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv()))
     origins.append('https://*.onrender.com')
+    origins.append('https://*.railway.app')
+    origins.append('https://*.up.railway.app')
 
     render_hostname = config('RENDER_EXTERNAL_HOSTNAME', default=None)
     if render_hostname:
         origins.append(f'https://{render_hostname}')
+
+    railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
+    if railway_domain:
+        origins.append(f'https://{railway_domain}')
 
     for host in _local_hosts():
         if host in {'localhost', '127.0.0.1', '[::1]'}:
