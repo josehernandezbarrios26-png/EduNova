@@ -1,4 +1,4 @@
-﻿"""
+"""
 Django settings for edunova_project project.
 Proyecto Formativo: SISTEMAS DE INFORMACIÓN Y DESARROLLO DE SOFTWARE EN EL MAGDALENA
 Software: EduNova (Sistema de Integración Técnica Education)
@@ -14,8 +14,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def _local_hosts():
-    """Genera una lista segura de hosts locales y de red privada para desarrollo."""
-    hosts = ['localhost', '127.0.0.1', '[::1]']
+    """Genera una lista segura de hosts locales, Render y de red privada para desarrollo."""
+    hosts = ['localhost', '127.0.0.1', '[::1]', '.onrender.com']
+
+    render_hostname = config('RENDER_EXTERNAL_HOSTNAME', default=None)
+    if render_hostname:
+        hosts.append(render_hostname)
 
     env_hosts = config('ALLOWED_HOSTS', default='', cast=Csv())
     hosts.extend(env_hosts)
@@ -40,15 +44,21 @@ def _local_hosts():
 
 
 def _csrf_trusted_origins():
-    """Registra solo orígenes locales de la red privada, sin abrir la aplicación al público."""
+    """Registra orígenes locales y de Render para peticiones seguras."""
     origins = list(config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv()))
+    origins.append('https://*.onrender.com')
+
+    render_hostname = config('RENDER_EXTERNAL_HOSTNAME', default=None)
+    if render_hostname:
+        origins.append(f'https://{render_hostname}')
 
     for host in _local_hosts():
         if host in {'localhost', '127.0.0.1', '[::1]'}:
             origins.append(f'http://{host}:8000')
             origins.append(f'https://{host}:8000')
-        else:
+        elif not host.startswith('.'):
             origins.append(f'http://{host}:8000')
+            origins.append(f'https://{host}')
 
     deduped = []
     seen = set()
@@ -91,6 +101,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -172,6 +183,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Archivos Multimedia (Actas escaneadas, fotos de evidencia)
 MEDIA_URL = 'media/'

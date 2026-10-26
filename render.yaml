@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: edunova
+    runtime: python
+    plan: free
+    rootDir: EduNova-master
+    buildCommand: bash build.sh
+    startCommand: gunicorn edunova_project.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.4
+      - key: DEBUG
+        value: "True"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DJANGO_SETTINGS_MODULE
+        value: edunova_project.settings

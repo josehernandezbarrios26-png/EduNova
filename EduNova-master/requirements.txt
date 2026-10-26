@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # PROYECTO FORMATIVO: "SISTEMAS DE INFORMACIÓN Y DESARROLLO DE SOFTWARE EN EL MAGDALENA"
 # SOFTWARE: EduNova (Sistema de Integración Técnica Education)
 # DEPENDENCIAS OFICIALES DEL PROYECTO (Python 3.12 compatible)
@@ -22,3 +22,9 @@ openpyxl>=3.1.2
 
 # API REST (endpoints JSON para fichas y calificaciones)
 djangorestframework==3.15.2
+
+# Servidor de producción WSGI para despliegue en la nube (Render, Linux)
+gunicorn>=21.2.0
+
+# Servidor eficiente de archivos estáticos (CSS, JS) en producción
+whitenoise>=6.6.0
