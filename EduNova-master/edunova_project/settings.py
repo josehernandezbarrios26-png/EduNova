@@ -14,61 +14,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def _local_hosts():
-    """Genera una lista segura de hosts locales, Render, Railway y de red privada."""
-    hosts = ['localhost', '127.0.0.1', '[::1]', '.onrender.com', '.railway.app', '.up.railway.app']
-
-    render_hostname = config('RENDER_EXTERNAL_HOSTNAME', default=None)
-    if render_hostname:
-        hosts.append(render_hostname)
-
-    railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
-    if railway_domain:
-        hosts.append(railway_domain)
-
-    env_hosts = config('ALLOWED_HOSTS', default='', cast=Csv())
-    hosts.extend(env_hosts)
-
-    try:
-        hostname = socket.gethostname()
-        for ip in socket.gethostbyname_ex(hostname)[2]:
-            if ip and ip not in hosts:
-                hosts.append(ip)
-    except Exception:
-        pass
-
-    try:
-        for family, _, _, _, sockaddr in socket.getaddrinfo(hostname or 'localhost', None, type=socket.SOCK_STREAM):
-            ip = sockaddr[0]
-            if ip and ip not in hosts and not ip.startswith('fe80:'):
-                hosts.append(ip)
-    except Exception:
-        pass
-
-    return [host for host in dict.fromkeys(hosts) if host]
+    """Permite todos los hosts para despliegues fluidos en Railway, Render y desarrollo."""
+    return ['*']
 
 
 def _csrf_trusted_origins():
     """Registra orígenes locales, Render y Railway para peticiones seguras."""
     origins = list(config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv()))
-    origins.append('https://*.onrender.com')
-    origins.append('https://*.railway.app')
-    origins.append('https://*.up.railway.app')
-
-    render_hostname = config('RENDER_EXTERNAL_HOSTNAME', default=None)
-    if render_hostname:
-        origins.append(f'https://{render_hostname}')
+    origins.extend([
+        'https://*.railway.app',
+        'https://*.up.railway.app',
+        'https://*.onrender.com',
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+    ])
 
     railway_domain = config('RAILWAY_PUBLIC_DOMAIN', default=None)
     if railway_domain:
         origins.append(f'https://{railway_domain}')
 
-    for host in _local_hosts():
-        if host in {'localhost', '127.0.0.1', '[::1]'}:
-            origins.append(f'http://{host}:8000')
-            origins.append(f'https://{host}:8000')
-        elif not host.startswith('.'):
-            origins.append(f'http://{host}:8000')
-            origins.append(f'https://{host}')
+    render_hostname = config('RENDER_EXTERNAL_HOSTNAME', default=None)
+    if render_hostname:
+        origins.append(f'https://{render_hostname}')
 
     deduped = []
     seen = set()

@@ -14,6 +14,8 @@ COPY . /app/
 
 RUN python manage.py collectstatic --no-input
 
+RUN chmod +x /app/start.sh
+
 EXPOSE 8000
 
-CMD ["sh", "-c", "gunicorn edunova_project.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2"]
+CMD ["bash", "/app/start.sh"]
